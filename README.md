@@ -17,7 +17,7 @@ For when you just want to sleep...
     - This is used to log into the register my attendance website
     - **These details ARE NOT saved or sent anywhere** just kept in memory until the program is terminated
 1. The bot will then get started checking your calendar and signing you in!
-    - Uses multithreading so calendars can be kept track of (somewhat[^bignote]) concurrently
+    - Uses multithreading so calendars can be kept track of (somewhat<sup>[1](#myfootnote1)</sup>) concurrently
     - Will inform you of any wrong-doings/errors
 
-[^bignote]: As conncurrently as the multithreading library in python can allow
+<a name="myfootnote1">1</a>: As conncurrently as the multithreading library in python can allow
