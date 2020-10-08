@@ -14,6 +14,10 @@ STILL_ALIVE = 10  # mins
 BACKOFF_MULT = 1.5  # * seconds
 LOOP_TIMEOUT = 5  # seconds
 
+# The percentage of the way through that events will be scheduled to be signed into
+SCHEDULE_START_PERCENT = 0.1
+SCHEDULE_END_PERCENT = 0.75
+
 
 def calendar_event_producer(info: list, calendar_api: CalendarAPI, pipeline: Pipeline, event: threading.Event):
     """
@@ -99,7 +103,7 @@ def button_consumer(info: dict, pipeline: Pipeline, event: threading.Event):
             range_seconds = (end - start).seconds
 
             # This is the first time the register attendance page will be check, this is to stop botcheckers/checking when there isn't anything to check
-            check_time = start + timedelta(seconds=random.randint(int(range_seconds * 0.10), int(range_seconds * 0.75)))
+            check_time = start + timedelta(seconds=random.randint(int(range_seconds * SCHEDULE_START_PERCENT), int(range_seconds * SCHEDULE_END_PERCENT)))
             check_time = check_time.replace(tzinfo=start.tzinfo)
             
             print(f'\n{calendarSummary.upper()} THREAD: Scheduled to sign into \"{current_event["summary"]}\" at {get_pretty_time(check_time)}')

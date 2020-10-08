@@ -89,11 +89,13 @@ def click_button(email: str, password: str, headless: bool = True, verbose: bool
         email_form.send_keys(email)
         password_form.send_keys(password)
         submit_button.click()
-    except NoSuchElementException:
+
+        # Wait until an element with the classes pb-block and mainBlock is found (this is because when the page is loaded both divs have classes 'pb-block ng-hide mainBlock')
+        WebDriverWait(browser, TIMEOUT).until(EC.presence_of_element_located((By.XPATH, "//div[@class='pb-block mainBlock']")))
+    except (NoSuchElementException, TimeoutException):
+        browser.close()
         raise CannotLoginException('Cannot login to Campus Connect. This could be due to factors other than an incorrect login')
 
-    # Wait until an element with the classes pb-block and mainBlock is found (this is because when the page is loaded both divs have classes 'pb-block ng-hide mainBlock')
-    WebDriverWait(browser, TIMEOUT).until(EC.presence_of_element_located((By.XPATH, "//div[@class='pb-block mainBlock']")))
 
     happening_now_div = browser.find_element_by_id('pbid-blockFoundHappeningNow')
     happened_before_div = browser.find_element_by_id('pbid-blockHappened30MinAgo')

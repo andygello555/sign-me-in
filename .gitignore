@@ -141,3 +141,7 @@ credentials.json
 token.pickle
 
 .vscode/
+
+
+# Smommit ignore
+.smommit/
