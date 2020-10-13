@@ -1,8 +1,10 @@
 import re
 import getpass
+from time import sleep
 
 
 EMAIL_REGEX = re.compile(r"(^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$)")
+Y_OR_N = ['y', 'n']
 
 def ask_for(question: str, answers: list):
     """ 
@@ -81,14 +83,14 @@ def handle_multiple_inputs(command: str, max: int = None) -> list:
             print(f'\nYou have currently input: {output}')
             current = [sub.lstrip() for sub in str(input(f'{command}: ')).split(',')]
             if len(current):
-                if ask_for('Is \"{}\" ok?'.format("\" and \"".join(current)), ['y', 'n']):
+                if ask_for('Is \"{}\" ok?'.format("\" and \"".join(current)), Y_OR_N):
                     for curr in current:
                         if curr not in output:
                             output.append(curr)
-                if not ask_for('Do you want to add more?', ['y', 'n']):
+                if not ask_for('Do you want to add more?', Y_OR_N):
                     break
             else:
-                if ask_for('Nothing has been entered do you want to exit inputting?', ['y', 'n']):
+                if ask_for('Nothing has been entered do you want to exit inputting?', Y_OR_N):
                     break
         else:
             print('You have reached the maximum number of entries.')
@@ -109,7 +111,10 @@ def handle_user_pass(command: str):
         email = str(input('Enter email: '))
         if bool(EMAIL_REGEX.match(email)):
             password = str(getpass.getpass(prompt='Enter password: '))
-            if ask_for('Are these details correct?', ['y', 'n']):
+            if ask_for("Do you want to peek your password? (Will appear for 5 seconds)", Y_OR_N):
+                print(password, end='\r')
+                sleep(5)
+            if ask_for('Are these details correct?', Y_OR_N):
                 break
         else:
             print('Email is not valid check again.')

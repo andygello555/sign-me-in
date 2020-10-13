@@ -59,10 +59,10 @@ For when you just want to sleep...
 ## Questions you might have
 
 Q. _Why does the bot schedule to sign me in at such random times?_
-A. **Because *they are* random times. The bot will purposefully choose a time between 10% and 75% of the way through an event. This is to try and stop any potential bot checkers from blacklisting your IP, because without this system then you might be . I don't know if Campus Connect has any bot checkers but it's better to be safe than sorry.**
+A. **Because *they are* random times. The bot will purposefully choose a time between 10% and 75% of the way through an event. This is to try and stop any potential bot checkers from blacklisting your IP. If you were scheduled to be signed in on the dot every time, it might be a bit suspicious. I don't know if Campus Connect has any bot checkers (they probably don't) but it's better to be safe than sorry.**
 
 Q. _Why 10% and 75%?_
-A. **Just to be safe. I've had a couple of lectures where the sign-in was only made available a couple of minutes into the lecture. Even though the bot will keep checking to see if it can sign in after every couple of seconds when it knows there is a timetabled lecture. It's better to sign-in once and only once to avoid re-opening a Selenium browser multiple times as this could lead to high memory usage.<sup>[2](#myfootnote2)</sup>**
+A. **Just to be safe. I've had a couple of lectures where the sign-in was only made available a couple of minutes into the lecture. Even though the bot will keep checking to see if it can sign in after every couple of seconds when it knows there is a timetabled lecture, it's better to sign-in once and only once to avoid re-opening a Selenium browser multiple times as this could lead to high memory usage.<sup>[2](#myfootnote2)</sup>**
 
 Q. _Why was Google Calendar used to keep track of events and not just have the bot constantly checking Campus Connect if there is a sign-in button?_
 A. **Mostly due to me using Google Calendar, as well as some other things:**

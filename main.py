@@ -39,7 +39,7 @@ try:
     pipeline = Pipeline(info)
 
     event = threading.Event()
-    print(f'\nStarting the {len(info) + 1} worker bees to watch calendars (To quit: keyboard interrupt, e.g. CTRL+C. Quitting might take a while so be patient)\n')
+    print(f'\nStarting the {len(info)} worker bees to watch calendars (To quit: keyboard interrupt, e.g. CTRL+C. Quitting might take a while so be patient)\n')
     sleep(3)
 
     # Start threads

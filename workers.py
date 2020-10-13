@@ -117,7 +117,7 @@ def button_consumer(info: dict, pipeline: Pipeline, event: threading.Event):
 
                 # Print a still alive message every STILL_ALIVE mins
                 if now.minute % STILL_ALIVE == 0 and alive_message:
-                    print(f'\n{calendarSummary.upper()} THREAD: STILL WAITING - Time is {get_pretty_time(now)}')
+                    print(f'\n{calendarSummary.upper()} THREAD: STILL WAITING - UP NEXT: \"{current_event["summary"]}\" at {get_pretty_time(check_time)} - Time now: {get_pretty_time(now)}')
                     alive_message = False
                 elif now.minute % STILL_ALIVE != 0:
                     alive_message = True
