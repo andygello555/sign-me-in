@@ -5,7 +5,7 @@ from utils.pipeline import Pipeline
 from google_calendar import CalendarAPI
 from utils import input_utils
 import time
-import concurrent.futures
+from concurrent.futures import ThreadPoolExecutor
 
 info = []
 
@@ -43,7 +43,7 @@ try:
     sleep(3)
 
     # Start threads
-    with concurrent.futures.ThreadPoolExecutor(max_workers=len(info) + 1) as executor:
+    with ThreadPoolExecutor(max_workers=len(info) + 1) as executor:
         executor.submit(calendar_event_producer, info, calendar_api, pipeline, event)
         for calendar in info:
             executor.submit(button_consumer, calendar, pipeline, event)

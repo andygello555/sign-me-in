@@ -1,5 +1,5 @@
 from datetime import datetime, timedelta
-from utils.time_utils import get_pretty_range, get_pretty_time, get_utc_now
+from utils.time_utils import get_pretty_range, get_pretty_time, get_utc_now, fromiso_Z
 from registration import CannotLoginException, click_button
 from time import sleep
 import random
@@ -36,7 +36,7 @@ def calendar_event_producer(info: list, calendar_api: CalendarAPI, pipeline: Pip
     """
 
     # Get an event from a calendar to access the timezone
-    ref_event = datetime.fromisoformat(calendar_api.get_next_n(info[0]['calendarId'])[0]['start']['dateTime'])
+    ref_event = fromiso_Z(calendar_api.get_next_n(info[0]['calendarId'])[0]['start']['dateTime'])
     tz = ref_event.tzinfo
     
     # Construct a lookup table of the furthest events put into the queue, this means that the back of the 
@@ -91,7 +91,7 @@ def button_consumer(info: dict, pipeline: Pipeline, event: threading.Event):
             current_event = pipeline.get_event(calendarId)
             course_id = current_event['summary'].split(' ')[0].lower()
 
-            start = datetime.fromisoformat(current_event['start']['dateTime'])
+            start = fromiso_Z(current_event['start']['dateTime'])
             now = get_utc_now(start.tzinfo)
 
             # If we are midway through an event then the scheduled time will be somewhere between NOW and the end of the event
@@ -99,7 +99,7 @@ def button_consumer(info: dict, pipeline: Pipeline, event: threading.Event):
             if now > start:
                 start = now
 
-            end = datetime.fromisoformat(current_event['end']['dateTime'])
+            end = fromiso_Z(current_event['end']['dateTime'])
             range_seconds = (end - start).seconds
 
             # This is the first time the register attendance page will be check, this is to stop botcheckers/checking when there isn't anything to check

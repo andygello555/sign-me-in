@@ -106,7 +106,10 @@ class CalendarAPI:
             raise CalendarNotChosen(f'Calendar {calendarId} was not chosen and therefore cannot be queried')
 
         # Format the datetime to UTC
-        now = datetime.datetime.utcnow().isoformat() + 'Z' if after is None else after
+        now = datetime.datetime.utcnow().isoformat() if after is None else after
+        # Add the UTC descriptor only if it's missing
+        if now[-1] != 'Z':
+            now += 'Z'
 
         events_result = self.service.events().list(calendarId=calendarId, timeMin=now,
                                     maxResults=cutoff, singleEvents=True,
