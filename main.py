@@ -39,6 +39,7 @@ try:
     pipeline = Pipeline(info)
 
     event = threading.Event()
+    selenium_lock = threading.Lock()
     print(f'\nStarting the {len(info)} worker bees to watch calendars (To quit: keyboard interrupt, e.g. CTRL+C. Quitting might take a while so be patient)\n')
     sleep(3)
 
@@ -46,7 +47,7 @@ try:
     with ThreadPoolExecutor(max_workers=len(info) + 1) as executor:
         executor.submit(calendar_event_producer, info, calendar_api, pipeline, event)
         for calendar in info:
-            executor.submit(button_consumer, calendar, pipeline, event)
+            executor.submit(button_consumer, calendar, pipeline, event, selenium_lock)
 
         # Check for keyboard interrupts so that threads can exit safely
         while True:

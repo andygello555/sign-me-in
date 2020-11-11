@@ -59,7 +59,7 @@ def calendar_event_producer(info: list, calendar_api: CalendarAPI, pipeline: Pip
                 print(f'\t~ PIPE IS FULL ~')
         sleep(LOOP_TIMEOUT)
 
-def button_consumer(info: dict, pipeline: Pipeline, event: threading.Event):
+def button_consumer(info: dict, pipeline: Pipeline, event: threading.Event, selenium_lock: threading.Lock):
     """
         Consumes google calendar events and clicks the sign-in button.
 
@@ -129,7 +129,11 @@ def button_consumer(info: dict, pipeline: Pipeline, event: threading.Event):
                 elif now >= check_time:
                     try:
                         print(f'\n{calendarSummary.upper()} THREAD: Preparing to click-in... ', end='')
+
+                        # Starting selenium so acquire lock, bad things could happen if another thread is scheduled during selenium
+                        selenium_lock.acquire(blocking=True)
                         clicked = click_button(username, password, course_id=course_id, search_params=info['search_params'])
+                        selenium_lock.release()
 
                         for_part = f'for \"{current_event["summary"]}\" at {get_pretty_range(current_event["start"]["dateTime"], current_event["end"]["dateTime"])}'
                         print(f'You have registered your attendance {for_part}' if clicked else f'Could not register attendance {for_part}, delaying by {timeout} seconds')
