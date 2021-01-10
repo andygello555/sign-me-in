@@ -1,4 +1,5 @@
 from datetime import datetime, timedelta
+from utils.config import CONFIG
 from utils.time_utils import get_pretty_range, get_pretty_time, get_utc_now, fromiso_Z
 from registration import CannotLoginException, click_button
 from time import sleep
@@ -8,15 +9,16 @@ from utils.pipeline import Pipeline
 from google_calendar import CalendarAPI
 import concurrent.futures
 
-MIN_CLICK_TIMEOUT = 5  # seconds
-MAX_CLICK_TIMEOUT = 360  # seconds
-STILL_ALIVE = 10  # mins
-BACKOFF_MULT = 1.5  # * seconds
-LOOP_TIMEOUT = 5  # seconds
+# Gather parameters from config
+MIN_CLICK_TIMEOUT = CONFIG.MIN_CLICK_TIMEOUT  # seconds
+MAX_CLICK_TIMEOUT = CONFIG.MAX_CLICK_TIMEOUT  # seconds
+STILL_ALIVE = CONFIG.STILL_ALIVE  # mins
+BACKOFF_MULT = CONFIG.BACKOFF_MULT  # * seconds
+LOOP_TIMEOUT = CONFIG.LOOP_TIMEOUT  # seconds
 
 # The percentage of the way through that events will be scheduled to be signed into
-SCHEDULE_START_PERCENT = 0.1
-SCHEDULE_END_PERCENT = 0.75
+SCHEDULE_START_PERCENT = CONFIG.SCHEDULE_START_PERCENT
+SCHEDULE_END_PERCENT = CONFIG.SCHEDULE_END_PERCENT
 
 
 def calendar_event_producer(info: list, calendar_api: CalendarAPI, pipeline: Pipeline, event: threading.Event):

@@ -135,6 +135,7 @@ class CalendarAPI:
 
 if __name__ == '__main__':
     api = CalendarAPI()
+    print(api.calendars_short)
     api.choose_calendars()
     next_events = api.get_next_n(api.chosen_calendars[0][2], 4, search_params=['cs2800'])
     print(next_events, len(next_events))

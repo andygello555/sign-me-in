@@ -1,11 +1,13 @@
 import threading
 from time import sleep
+from utils.file import IncorrectPassword, calendars_exists, load_latest_calendar, save_encrypted
 from workers import button_consumer, calendar_event_producer
 from utils.pipeline import Pipeline
 from google_calendar import CalendarAPI
 from utils import input_utils
 import time
 from concurrent.futures import ThreadPoolExecutor
+import json
 
 info = []
 
@@ -15,25 +17,46 @@ try:
     time.sleep(3)
     calendar_api = CalendarAPI()
 
-    # Choose calendars to keep track of
-    calendar_api.choose_calendars()
+    auto = False
+    # If there exists a recent calendar info file then ask user if they want to decrypt and use it
+    if calendars_exists():
+        if input_utils.ask_for('Do you want to use the most recently saved calendar info file (requires password for decryption)?', input_utils.Y_OR_N):
+            while True:
+                try:
+                    info = load_latest_calendar()
+                    auto = True
+                    # Assign the chosen calendars in the api instance
+                    calendar_api.chosen_calendars = [(next(filter(lambda c: c[2] == calendar['calendarId'], calendar_api.calendars_short))[0], calendar['calendarSummary'], calendar['calendarId']) for calendar in info]
+                    break
+                except IncorrectPassword as e:
+                    print(e)
+                    if not input_utils.ask_for('Do you want to try again?', input_utils.Y_OR_N):
+                        break
 
-    # Choose search params for each calendar
-    print('\n\n\nEnter a list of comma seperated search paramters, for each calendar, that each google calendar event will be checked against to '
-          'check for a sign-in button on the register attendance page. An empty list indicates a capture of all events.')
-    for calendar in calendar_api.chosen_calendars:
-        print(
-            f'\n\nEnter seach params for calendar: {calendar[1]} (CASE INSENSITIVE)')
-        info.append({
-                    'calendarSummary': calendar[1],
-                    'calendarId': calendar[2],
-                    'search_params': [param.lower() for param in input_utils.handle_multiple_inputs('Enter a list of search params')]
-                    })
+    if not auto:
+        # Choose calendars to keep track of if not found from a recent calendar file
+        calendar_api.choose_calendars()
 
-        # Then ask the user for a username and password for campus connect
-        info[-1]['username'], info[-1]['password'] = input_utils.handle_user_pass(
-            'Please enter your Campus Connect login (same as Outlook login)')
-    # print(info, calendar_api.chosen_calendars)
+        # Choose search params for each calendar
+        print('\n\n\nEnter a list of comma seperated search paramters, for each calendar, that each google calendar event will be checked against to '
+            'check for a sign-in button on the register attendance page. An empty list indicates a capture of all events.')
+        for calendar in calendar_api.chosen_calendars:
+            print(
+                f'\n\nEnter seach params for calendar: {calendar[1]} (CASE INSENSITIVE)')
+            info.append({
+                        'calendarSummary': calendar[1],
+                        'calendarId': calendar[2],
+                        'search_params': [param.lower() for param in input_utils.handle_multiple_inputs('Enter a list of search params')]
+                        })
+
+            # Then ask the user for a username and password for campus connect
+            info[-1]['username'], info[-1]['password'] = input_utils.handle_user_pass(
+                'Please enter your Campus Connect login (same as Outlook login)')
+        # print(f'Info:\n{json.dumps(info, indent=4, sort_keys=True)}\n\nChosen:\n{calendar_api.chosen_calendars}')
+
+        # Ask if user wants to save calendar info to an encrypted file
+        if input_utils.ask_for('Do you want to save this info to an encrypted file so that the bot can be started quicker next time?', input_utils.Y_OR_N):
+            save_encrypted(info)
 
     # Then create the pipeline
     pipeline = Pipeline(info)

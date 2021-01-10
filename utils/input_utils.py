@@ -96,6 +96,33 @@ def handle_multiple_inputs(command: str, max: int = None) -> list:
             print('You have reached the maximum number of entries.')
     return output
 
+def password_input(what_for: str, first_time: bool = True) -> str:
+    """A standard password re-entry prompt
+
+    Args:
+        what_for (str): a string which describes what the password is for
+        first_time (bool): whether or not a user is asked to re-enter password
+
+    Returns:
+        str: the entered password
+    """
+    while True:
+        password = str(getpass.getpass(prompt=f'Enter password for {what_for}: '))
+        if first_time:
+            reenterred_pass = str(getpass.getpass(prompt='Re-enter password: '))
+            if password == reenterred_pass:
+                break
+            print('Passwords don\'t match. Try again.')
+        else:
+            if ask_for("Do you want to peek your password? (Will appear for 5 seconds)", Y_OR_N):
+                print(password, end='\r')
+                sleep(5)
+                if ask_for('Are these details correct?', Y_OR_N):
+                    break
+            else:
+                break
+    return password
+
 def handle_user_pass(command: str):
     """
         Asks for user to input a username and password

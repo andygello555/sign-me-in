@@ -1,4 +1,5 @@
 from typing import Iterable
+from utils.config import CONFIG
 from selenium.common.exceptions import ElementClickInterceptedException, NoSuchElementException, TimeoutException
 from selenium.webdriver import Firefox, FirefoxProfile
 from selenium.webdriver.firefox.options import Options
@@ -8,7 +9,7 @@ from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 
-REGISTER_ATTENDANCE_URL = 'https://generalssb-prod.ec.royalholloway.ac.uk/BannerExtensibility/customPage/page/RHUL_Attendance_Student'
+REGISTER_ATTENDANCE_URL = CONFIG.REGISTER_ATTENDANCE_URL
 GET_ATTR_SCRIPT = 'var items = {}; for (index = 0; index < arguments[0].attributes.length; ++index) { items[arguments[0].attributes[index].name] = arguments[0].attributes[index].value }; return items;'
 GET_TEXT_SCRIPT = """
 var parent = arguments[0];
