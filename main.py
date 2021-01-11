@@ -22,7 +22,7 @@ try:
         # If the simple command line option is given then assume that most recent calendar info 
         # file should be used and use a normal input for password entry
         if len(sys.argv) == 2 and sys.argv[1] == '--simple':
-            print('Continuing using simple input mode')
+            print('~ Continuing using simple input mode ~')
             simple_input_mode = True
         else:
             print('Unrecognized command line arguments')

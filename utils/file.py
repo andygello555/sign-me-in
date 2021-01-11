@@ -109,10 +109,7 @@ def load_latest_calendar(path: str = SAVED_CALENDAR_PATH, simple: bool = False) 
             if not simple:
                 password = password_input(f'decrypting previous calendar info file ({basename(recent_calendar)})', False)
             else:
-                simple_prompt = 'Enter password to decrypt previous calendar info file (THIS INPUT IS NOT HIDDEN BUT WILL BE OVERWRITTEN AFTER TYPED): '
-                password = input(simple_prompt)
-                # input((len(simple_prompt) * ' ') + (len(password) * ' '))
-                print('\033[F~VANISHED~' + ((len(simple_prompt) - 10) * ' ') + (len(password) * ' '))
+                password = sys.stdin.read()[:-1].strip()
             hash_pass.update(bytes(password, 'utf-8'))
             decryptor = AES.new(hash_pass.digest(), AES.MODE_CBC, IV)
             data = decryptor.decrypt(in_file.read())

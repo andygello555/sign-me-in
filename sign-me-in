@@ -1,0 +1,5 @@
+#!/bin/bash
+echo -n "Password for most recent calendar info: "
+read -sr password
+echo
+echo "$password" | python3 -u main.py --simple
