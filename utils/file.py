@@ -13,7 +13,7 @@ SAVED_CALENDAR_PATH = CONFIG.SAVED_CALENDAR_PATH
 
 class IncorrectPassword(Exception):
     def __init__(self, **kwargs):
-        super(IncorrectPassword, self).__init__('Decrypted text could not be converted json, therefore it\'s assumed that the password is incorrect', **kwargs)
+        super(IncorrectPassword, self).__init__('Decrypted text could not be decoded to utf-8/converted json, therefore it\'s assumed that the password is incorrect', **kwargs)
 
 def get_calendars(path: str = SAVED_CALENDAR_PATH) -> list:
     """Gets all the filenames of the calendar infos inside the given path
@@ -86,11 +86,12 @@ def save_encrypted(calendars: list):
         out_file.write(IV)
         out_file.write(ciphertext)
 
-def load_latest_calendar(path: str = SAVED_CALENDAR_PATH) -> list:
+def load_latest_calendar(path: str = SAVED_CALENDAR_PATH, simple: bool = False) -> list:
     """Loads the latest calendar info file, by asking for the decryption password
 
     Args:
         path (str, optional): The path of the saved calendars. Defaults to SAVED_CALENDAR_PATH.
+        simple (bool, optional): Whether or not simple input should be used. This is for server's which use supervisor. Defaults to SAVED_CALENDAR_PATH.
 
     Raises:
         IncorrectPassword: If the decrypted file cannot be decoded to JSON, it is assumed that the password is incorrect
@@ -105,11 +106,18 @@ def load_latest_calendar(path: str = SAVED_CALENDAR_PATH) -> list:
         with open(recent_calendar, 'rb') as in_file:
             IV = in_file.read(16)
             hash_pass = SHA256.new()
-            hash_pass.update(bytes(password_input(f'decrypting previous calendar info file ({basename(recent_calendar)})', False), 'utf-8'))
+            if not simple:
+                password = password_input(f'decrypting previous calendar info file ({basename(recent_calendar)})', False)
+            else:
+                simple_prompt = 'Enter password to decrypt previous calendar info file (THIS INPUT IS NOT HIDDEN BUT WILL BE OVERWRITTEN AFTER TYPED): '
+                password = input(simple_prompt)
+                # input((len(simple_prompt) * ' ') + (len(password) * ' '))
+                print('\033[F~VANISHED~' + ((len(simple_prompt) - 10) * ' ') + (len(password) * ' '))
+            hash_pass.update(bytes(password, 'utf-8'))
             decryptor = AES.new(hash_pass.digest(), AES.MODE_CBC, IV)
             data = decryptor.decrypt(in_file.read())
-        data = data[:-data[-1]].decode('utf-8')
         try:
+            data = data[:-data[-1]].decode('utf-8')
             calendar_info = json.loads(data)
         except:
             raise IncorrectPassword()

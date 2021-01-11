@@ -138,7 +138,7 @@ dmypy.json
 cython_debug/
 
 credentials.json
-token.pickle
+*.pickle
 
 .vscode/
 
