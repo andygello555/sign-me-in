@@ -8,6 +8,7 @@ from Crypto.Cipher import AES
 from Crypto.Hash import SHA256
 from Crypto import Random
 import json
+import sys
 
 SAVED_CALENDAR_PATH = CONFIG.SAVED_CALENDAR_PATH
 
