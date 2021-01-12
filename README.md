@@ -29,7 +29,7 @@ For when you just want to sleep...
 - pip
 - A Google account with your uni calendar synced
     - Follow the _Downloading Calendar timetable into Google_ section in [this](https://intranet.royalholloway.ac.uk/staff/assets/docs/pdf/timetabling/timetabling-pdfs-2019-20/how-to-subscribe-to-your-rhul-timetable-via-a-calendar-application-v2-updated.pdf) PDF to do that
-- Maybe some sort of [server](####Servers) to run the bot on, **not a requirement**
+- Maybe some sort of [server](#servers) to run the bot on, **not a requirement**
 
 #### Install and setup
 
@@ -58,11 +58,11 @@ For when you just want to sleep...
 1. After entering all info the current "setup" can be saved to an encrypted file so that the bot can be started quicker next time using this file
     - Saved configs are encrypted using a password of your definition
     - They are encrypted using the AES module within the [PyCryptoDome](https://pycryptodome.readthedocs.io/en/latest/) library
-    - This is useful for [server setups](####Servers)
+    - This is useful for [server setups](#servers)
     - **When starting up again...**
         - Bot will notify you of having a recently saved calendar info file
         - Enter the password and the bot will decrypt and start its workers quickly
-    - Save location can be changed by [creating a config file](####Configuration) and defining the `SAVED_CALENDAR_PATH` parameter within it
+    - Save location can be changed by [creating a config file](#configuration) and defining the `SAVED_CALENDAR_PATH` parameter within it
     - Calendar info files are saved as unix timestamped `.pickle` files
         - Behind the scenes these are just JSON structures which are padded and encrypted using AES
 
@@ -131,4 +131,4 @@ A. **Mostly due to me using Google Calendar, as well as some other things:**
 
 
 <a name="myfootnote1">1</a>: As concurrently as the multithreading library in python can allow</br>
-<a name="myfootnote2">2</a>: If you want to change this, there are two constants ~~inside  `workers.py`: `SCHEDULE_START_PERCENT` and `SCHEDULE_END_PERCENT` which can be easily changed to different percentages.~~ which can now be changed in the [config file](####Configuration)
+<a name="myfootnote2">2</a>: If you want to change this, there are two constants ~~inside  `workers.py`: `SCHEDULE_START_PERCENT` and `SCHEDULE_END_PERCENT` which can be easily changed to different percentages.~~ which can now be changed in the [config file](#configuration)
