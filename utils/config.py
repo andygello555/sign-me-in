@@ -11,7 +11,8 @@ PARAMETERS = {
     'BACKOFF_MULT',
     'LOOP_TIMEOUT',
     'SCHEDULE_START_PERCENT',
-    'SCHEDULE_END_PERCENT'
+    'SCHEDULE_END_PERCENT',
+    'HEADLESS'
 }
 
 class ConfigException(Exception):
@@ -67,7 +68,8 @@ DEFAULT_CONFIG = Config(
     LOOP_TIMEOUT=5,  # seconds
     # The percentage of the way through that events will be scheduled to be signed into
     SCHEDULE_START_PERCENT=0.1,
-    SCHEDULE_END_PERCENT=0.75
+    SCHEDULE_END_PERCENT=0.75,
+    HEADLESS=True
 )
 
 def read_config() -> Config:

@@ -1,3 +1,4 @@
+import time
 from typing import Iterable
 from utils.config import CONFIG
 from selenium.common.exceptions import ElementClickInterceptedException, NoSuchElementException, TimeoutException
@@ -76,12 +77,10 @@ def click_button(email: str, password: str, headless: bool = True, verbose: bool
 
     browser = start_selenium(headless)
 
-    WebDriverWait(browser, TIMEOUT).until(EC.presence_of_element_located((By.ID, 'formsAuthenticationArea')))
-
     try:
-        email_form = browser.find_element_by_id('userNameInput')
-        password_form = browser.find_element_by_id('passwordInput')
-        submit_button = browser.find_element_by_id('submitButton')
+        email_form = WebDriverWait(browser, TIMEOUT).until(EC.presence_of_element_located((By.ID, 'userNameInput')))
+        password_form = WebDriverWait(browser, TIMEOUT).until(EC.presence_of_element_located((By.ID, 'passwordInput')))
+        submit_button = WebDriverWait(browser, TIMEOUT).until(EC.presence_of_element_located((By.ID, 'submitButton')))
 
         if verbose:
             print('Found login form:')
@@ -92,6 +91,8 @@ def click_button(email: str, password: str, headless: bool = True, verbose: bool
         submit_button.click()
 
         # Wait until an element with the classes pb-block and mainBlock is found (this is because when the page is loaded both divs have classes 'pb-block ng-hide mainBlock')
+        # Recently the sign-in page has been very slow so we'll wait for a bit
+        time.sleep(TIMEOUT * 3)
         WebDriverWait(browser, TIMEOUT).until(EC.presence_of_element_located((By.XPATH, "//div[@class='pb-block mainBlock']")))
     except (NoSuchElementException, TimeoutException):
         browser.close()

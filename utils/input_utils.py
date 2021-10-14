@@ -26,7 +26,7 @@ def ask_for(question: str, answers: list):
 
 def handle_multiple_range(question1: str, question2: str, yes_no: list, lines: list):
     """
-        Handles input for a list of possible answers. Multple answers can be given.
+        Handles input for a list of possible answers. Multiple answers can be given.
 
         Args:
             question1: the question asked when asking the user for input
@@ -43,7 +43,7 @@ def handle_multiple_range(question1: str, question2: str, yes_no: list, lines: l
     while True:
         if answer_no < len(lines):
             try:
-                answers[answer_no] = input((f'{question1}: '))
+                answers[answer_no] = input(f'{question1}: ')
                 if answers[answer_no] in '*q':
                     if answers[answer_no] == '*' and ask_for('Are you sure you want to add all?', yes_no):
                         answers = [i+1 for i in range(len(lines))]

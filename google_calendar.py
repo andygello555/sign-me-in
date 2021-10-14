@@ -1,10 +1,12 @@
 from __future__ import print_function
 import datetime
-import pickle
+import json
+from os import sep
 import os.path
 from googleapiclient.discovery import build
 from google_auth_oauthlib.flow import InstalledAppFlow
 from google.auth.transport.requests import Request
+from google.oauth2.credentials import Credentials
 
 from tabulate import tabulate
 from utils import input_utils
@@ -21,7 +23,6 @@ class CalendarNotChosen(RuntimeError):
 class CalendarAPI:
     SCOPES = ['https://www.googleapis.com/auth/calendar.readonly']
 
-
     def __init__(self):
         """
             Basic implementation of the Google Calendar API as well as some helpful abstractions.
@@ -30,23 +31,21 @@ class CalendarAPI:
         """
         
         creds = None
-        # The file token.pickle stores the user's access and refresh tokens, and is
+        # The file token.json stores the user's access and refresh tokens, and is
         # created automatically when the authorization flow completes for the first
-        # time.
-        if os.path.exists('token.pickle'):
-            with open('token.pickle', 'rb') as token:
-                creds = pickle.load(token)
+        # time.            
+        if os.path.exists('token.json'):
+            creds = Credentials.from_authorized_user_file('token.json', self.SCOPES)
         # If there are no (valid) credentials available, let the user log in.
         if not creds or not creds.valid:
             if creds and creds.expired and creds.refresh_token:
                 creds.refresh(Request())
             else:
-                flow = InstalledAppFlow.from_client_secrets_file(
-                    'credentials.json', self.SCOPES)
+                flow = InstalledAppFlow.from_client_secrets_file('credentials.json', self.SCOPES)
                 creds = flow.run_local_server(port=0)
             # Save the credentials for the next run
-            with open('token.pickle', 'wb') as token:
-                pickle.dump(creds, token)
+            with open('token.json', 'w') as token:
+                token.write(creds.to_json())
 
         self.service = build('calendar', 'v3', credentials=creds)
 
@@ -106,10 +105,14 @@ class CalendarAPI:
             raise CalendarNotChosen(f'Calendar {calendarId} was not chosen and therefore cannot be queried')
 
         # Format the datetime to UTC
-        now = datetime.datetime.utcnow().isoformat() if after is None else after
-        # Add the UTC descriptor only if it's missing
-        if now[-1] != 'Z':
-            now += 'Z'
+        raw = datetime.datetime.now().isoformat() if after is None else after
+        now = raw
+        if raw.find('.') > -1:
+            now = raw[:raw.find('.') + 4]
+            if raw.find('+') > -1:
+                now += raw[raw.find('+'):]
+            else:
+                now += 'Z'
 
         events_result = self.service.events().list(calendarId=calendarId, timeMin=now,
                                     maxResults=cutoff, singleEvents=True,

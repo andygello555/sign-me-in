@@ -1,13 +1,17 @@
+import json
 import threading
 from time import sleep
+
+from googleapiclient.errors import HttpError
 from utils.file import IncorrectPassword, calendars_exists, load_latest_calendar, save_encrypted
 from workers import button_consumer, calendar_event_producer
 from utils.pipeline import Pipeline
 from google_calendar import CalendarAPI
 from utils import input_utils
 import time
-from concurrent.futures import ThreadPoolExecutor
+from concurrent.futures import ThreadPoolExecutor, as_completed
 import sys
+import traceback
 
 info = []
 
@@ -80,10 +84,18 @@ try:
     sleep(3)
 
     # Start threads
+    futures = []
     with ThreadPoolExecutor(max_workers=len(info) + 1) as executor:
-        executor.submit(calendar_event_producer, info, calendar_api, pipeline, event)
+        futures.append(executor.submit(calendar_event_producer, info, calendar_api, pipeline, event))
         for calendar in info:
-            executor.submit(button_consumer, calendar, pipeline, event, selenium_lock)
+            futures.append(executor.submit(button_consumer, calendar, pipeline, event, selenium_lock))
+
+        for future in as_completed(futures):
+            try:
+                future.result()
+            except Exception as exc:
+                print(exc)
+                traceback.print_tb(exc.__traceback__)
 
         # Check for keyboard interrupts so that threads can exit safely
         while True:

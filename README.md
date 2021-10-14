@@ -112,6 +112,7 @@ Some things to note...
 | LOOP_TIMEOUT            | How long (in seconds) the calendar event checker should sleep for after checking for new events | _Number_ (3-10 are sensible) | 5 |
 | SCHEDULE_START_PERCENT  | The start percentage of the time slot after which sign ins are scheduled | _Float 0-1_ **Must be less than SCHEDULE_END_PERCENT** | 0.1 |
 | SCHEDULE_END_PERCENT    | The end percentage of the time slot before which sign ins are scheduled | _Float 0-1_ **Must be more than SCHEDULE_START_PERCENT** |
+| HEADLESS                | Whether or not selenium should spawn in headless mode or not | _Boolean_ | True |
 
 </br>
 

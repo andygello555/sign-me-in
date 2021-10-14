@@ -142,6 +142,9 @@ credentials.json
 
 .vscode/
 
-
 # Smommit ignore
 .smommit/
+
+config.json
+
+token.json

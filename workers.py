@@ -7,7 +7,6 @@ import random
 import threading
 from utils.pipeline import Pipeline
 from google_calendar import CalendarAPI
-import concurrent.futures
 
 # Gather parameters from config
 MIN_CLICK_TIMEOUT = CONFIG.MIN_CLICK_TIMEOUT  # seconds
@@ -19,6 +18,8 @@ LOOP_TIMEOUT = CONFIG.LOOP_TIMEOUT  # seconds
 # The percentage of the way through that events will be scheduled to be signed into
 SCHEDULE_START_PERCENT = CONFIG.SCHEDULE_START_PERCENT
 SCHEDULE_END_PERCENT = CONFIG.SCHEDULE_END_PERCENT
+
+HEADLESS = CONFIG.HEADLESS
 
 
 def calendar_event_producer(info: list, calendar_api: CalendarAPI, pipeline: Pipeline, event: threading.Event):
@@ -134,7 +135,7 @@ def button_consumer(info: dict, pipeline: Pipeline, event: threading.Event, sele
 
                         # Starting selenium so acquire lock, bad things could happen if another thread is scheduled during selenium
                         selenium_lock.acquire(blocking=True)
-                        clicked = click_button(username, password, course_id=course_id, search_params=info['search_params'])
+                        clicked = click_button(username, password, headless=HEADLESS, course_id=course_id, search_params=info['search_params'])
                         selenium_lock.release()
 
                         for_part = f'for \"{current_event["summary"]}\" at {get_pretty_range(current_event["start"]["dateTime"], current_event["end"]["dateTime"])}'
