@@ -7,6 +7,7 @@ import random
 import threading
 from utils.pipeline import Pipeline
 from google_calendar import CalendarAPI
+import pytz
 
 # Gather parameters from config
 MIN_CLICK_TIMEOUT = CONFIG.MIN_CLICK_TIMEOUT  # seconds
@@ -39,12 +40,11 @@ def calendar_event_producer(info: list, calendar_api: CalendarAPI, pipeline: Pip
     """
 
     # Get an event from a calendar to access the timezone
-    ref_event = fromiso_Z(calendar_api.get_next_n(info[0]['calendarId'])[0]['start']['dateTime'])
-    tz = ref_event.tzinfo
+    timezone = pytz.timezone(calendar_api.get_next_n(info[0]['calendarId'])[0]['start']['timeZone'])
     
     # Construct a lookup table of the furthest events put into the queue, this means that the back of the 
     # queue doesn't need to be check
-    furthest = {_info['calendarId']: get_utc_now(tz, True) for _info in info}
+    furthest = {_info['calendarId']: get_utc_now(timezone, True) for _info in info}
 
     while not event.is_set():
         calendar_ID = pipeline.get_first_non_full()
@@ -54,7 +54,7 @@ def calendar_event_producer(info: list, calendar_api: CalendarAPI, pipeline: Pip
             print(f'\nPRODUCER - Calendar: \"{calendar_info["calendarSummary"].upper()}\" has a non-full pipe')
 
             next_event = calendar_api.get_next_n(calendar_ID, after=furthest[calendar_ID], search_params=search_params)[0]
-            furthest[calendar_ID] = next_event['end'].get('dateTime', next_event['end'].get('date', get_utc_now(tz, True)))
+            furthest[calendar_ID] = next_event['end'].get('dateTime', next_event['end'].get('date', get_utc_now(timezone, True)))
 
             print(f'\tAdded event: \"{next_event["summary"]}\" ({get_pretty_range(next_event["start"]["dateTime"], next_event["end"]["dateTime"])})')
             pipeline.put_event(calendar_ID, next_event)
@@ -95,7 +95,8 @@ def button_consumer(info: dict, pipeline: Pipeline, event: threading.Event, sele
             course_id = current_event['summary'].split(' ')[0].lower()
 
             start = fromiso_Z(current_event['start']['dateTime'])
-            now = get_utc_now(start.tzinfo)
+            timezone = pytz.timezone(current_event['start']['timeZone'])
+            now = get_utc_now(timezone)
 
             # If we are midway through an event then the scheduled time will be somewhere between NOW and the end of the event
             # This shouldn't happen unless the bot is started during an event
@@ -116,7 +117,7 @@ def button_consumer(info: dict, pipeline: Pipeline, event: threading.Event, sele
             timeout = MIN_CLICK_TIMEOUT
             alive_message = True
             while not clicked and not event.is_set():
-                now = get_utc_now(start.tzinfo)
+                now = get_utc_now(timezone)
 
                 # Print a still alive message every STILL_ALIVE mins
                 if now.minute % STILL_ALIVE == 0 and alive_message:
