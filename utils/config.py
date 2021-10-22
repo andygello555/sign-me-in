@@ -12,7 +12,11 @@ PARAMETERS = {
     'LOOP_TIMEOUT',
     'SCHEDULE_START_PERCENT',
     'SCHEDULE_END_PERCENT',
-    'HEADLESS'
+    'HEADLESS',
+    'BUTTON_ONE_ID',
+    'BUTTON_TWO_ID',
+    'BUTTON_30_ONE_ID',
+    'BUTTON_30_TWO_ID'
 }
 
 class ConfigException(Exception):
@@ -69,7 +73,11 @@ DEFAULT_CONFIG = Config(
     # The percentage of the way through that events will be scheduled to be signed into
     SCHEDULE_START_PERCENT=0.1,
     SCHEDULE_END_PERCENT=0.75,
-    HEADLESS=True
+    HEADLESS=True,  # Whether or not to run selenium headless
+    BUTTON_ONE_ID='pbid-buttonFoundHappeningNowButtonsHere',  # The ID of the button to click if only one button is found
+    BUTTON_TWO_ID='pbid-buttonFoundHappeningNowButtonsTwoInPerson',  # The ID of the button to click if two buttons are found
+    BUTTON_30_ONE_ID='pbid-buttonHappened30MinAgoButtonsOneHere',  # The ID of the button to click if only one button is found in 30 mins ago section
+    BUTTON_30_TWO_ID='pbid-buttonHappened30MinAgoButtonsTwoInPerson'  # The ID of the button to click if two buttons are found in 30 mins ago section
 )
 
 def read_config() -> Config:

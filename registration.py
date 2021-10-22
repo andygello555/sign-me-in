@@ -2,11 +2,10 @@ import time
 from typing import Iterable
 from utils.config import CONFIG
 from selenium.common.exceptions import ElementClickInterceptedException, NoSuchElementException, TimeoutException
-from selenium.webdriver import Firefox, FirefoxProfile
+from selenium.webdriver import Firefox
 from selenium.webdriver.firefox.options import Options
 from selenium.webdriver.firefox.webelement import FirefoxWebElement
 from selenium.webdriver.common.by import By
-from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 
@@ -92,8 +91,21 @@ def click_button(email: str, password: str, headless: bool = True, verbose: bool
 
         # Wait until an element with the classes pb-block and mainBlock is found (this is because when the page is loaded both divs have classes 'pb-block ng-hide mainBlock')
         # Recently the sign-in page has been very slow so we'll wait for a bit
-        time.sleep(TIMEOUT * 3)
-        WebDriverWait(browser, TIMEOUT).until(EC.presence_of_element_located((By.XPATH, "//div[@class='pb-block mainBlock']")))
+        tries = 7
+        while True:
+            tries -= 1
+            try:
+                if verbose:
+                    print(f'Trying to find mainBlock again. Tries: {tries}')
+                WebDriverWait(browser, TIMEOUT).until(EC.presence_of_element_located((By.XPATH, "//div[@class='pb-block mainBlock']")))
+            except TimeoutException:
+                if verbose:
+                    print(f'Could not find main block {"trying again" if tries else "no tries left"}')
+                if not tries:
+                    raise TimeoutException
+                continue
+            else:
+                break
     except (NoSuchElementException, TimeoutException):
         browser.close()
         raise CannotLoginException('Cannot login to Campus Connect. This could be due to factors other than an incorrect login')
@@ -130,7 +142,7 @@ def click_button(email: str, password: str, headless: bool = True, verbose: bool
                     print_attr_elements(browser, [one_button, two_buttons])
 
                 # Assign button id to the button nested inside the non-hidden element
-                button_id = 'pbid-buttonFoundHappeningNowButtonsHere' if HIDDEN_CLASS not in one_button.get_attribute('class') else 'pbid-buttonFoundHappeningNowButtonsTwoOnline'
+                button_id = CONFIG.BUTTON_ONE_ID if HIDDEN_CLASS not in one_button.get_attribute('class') else CONFIG.BUTTON_TWO_ID
             elif verbose:
                 print('Found block but of the wrong course ID')
         else:
@@ -149,22 +161,16 @@ def click_button(email: str, password: str, headless: bool = True, verbose: bool
                 print('\nHappened 30 min ago is not hidden:')
                 print_attr_elements(browser, [one_button, two_buttons])
 
-            button_id = 'pbid-buttonHappened30MinAgoButtonsOneHere' if HIDDEN_CLASS not in one_button.get_attribute('class') else 'pbid-buttonHappened30MinAgoButtonsTwoOnline'
+            button_id = CONFIG.BUTTON_30_ONE_ID if HIDDEN_CLASS not in one_button.get_attribute('class') else CONFIG.BUTTON_30_TWO_ID
     except TimeoutException:
         # One of the elements could not be found so continue and return False
         pass
 
 
     button = None
-    if one_button is not None and button_id is not None:
+    if button_id is not None:
         try:
-            # If there is only one button present press that button
-            if HIDDEN_CLASS not in one_button.get_attribute('class'):
-                button = WebDriverWait(browser, TIMEOUT).until(EC.element_to_be_clickable((By.ID, button_id)))
-            else:
-                # Assume that there are two buttons. And press the 'Online' button
-                button = WebDriverWait(browser, TIMEOUT).until(EC.element_to_be_clickable((By.ID, button_id)))
-
+            button = WebDriverWait(browser, TIMEOUT).until(EC.element_to_be_clickable((By.ID, button_id)))
             # Finally click the button if found
             button.click()
         except TimeoutException:
@@ -178,4 +184,4 @@ def click_button(email: str, password: str, headless: bool = True, verbose: bool
     return button is not None
 
 if __name__ == '__main__':
-    print('Pressed button' if click_button(input('Enter email: '), input('Enter password: '), verbose=True) else 'Button not pressed')
+    print('Pressed button' if click_button(input('Enter email: '), input('Enter password: '), verbose=True, headless=CONFIG.HEADLESS) else 'Button not pressed')

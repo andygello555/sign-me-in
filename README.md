@@ -113,6 +113,10 @@ Some things to note...
 | SCHEDULE_START_PERCENT  | The start percentage of the time slot after which sign ins are scheduled | _Float 0-1_ **Must be less than SCHEDULE_END_PERCENT** | 0.1 |
 | SCHEDULE_END_PERCENT    | The end percentage of the time slot before which sign ins are scheduled | _Float 0-1_ **Must be more than SCHEDULE_START_PERCENT** |
 | HEADLESS                | Whether or not selenium should spawn in headless mode or not | _Boolean_ | True |
+| BUTTON_ONE_ID | The DOM ID of the button to press if there is only one button to press in "Happening Now". I.e. the "I'm Here" button. You probably don't need to change this. | _String_ | `pbid-buttonFoundHappeningNowButtonsHere` |
+| BUTTON_TWO_ID | The DOM ID of the button to press if there are two buttons to click in "Happening Now". I.e. either "Online" or "In-person". | _String_ | `pbid-buttonFoundHappeningNowButtonsTwoInPerson` |
+| BUTTON_30_ONE_ID | The DOM ID of the button to press if there is only one button to press in the "Happened 30 Minutes Ago" section. I.e. the "I'm Here" button. You probably don't need to change this. | _String_ | `pbid-buttonHappened30MinAgoButtonsOneHere` |
+| BUTTON_30_TWO_ID | The DOM ID of the button to press if there are two buttons to click in the "Happened 30 Minutes Ago" section. I.e. either "Online" or "In-person". | _String_ | `pbid-buttonHappened30MinAgoButtonsTwoInPerson` |
 
 </br>
 
