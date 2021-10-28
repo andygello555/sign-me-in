@@ -96,6 +96,7 @@ def button_consumer(info: dict, pipeline: Pipeline, event: threading.Event, sele
 
             start = fromiso_Z(current_event['start']['dateTime'])
             timezone = pytz.timezone(current_event['start']['timeZone'])
+            start = start.astimezone(timezone)
             now = get_utc_now(timezone)
 
             # If we are midway through an event then the scheduled time will be somewhere between NOW and the end of the event
@@ -104,6 +105,7 @@ def button_consumer(info: dict, pipeline: Pipeline, event: threading.Event, sele
                 start = now
 
             end = fromiso_Z(current_event['end']['dateTime'])
+            end = end.astimezone(timezone)
             range_seconds = (end - start).seconds
 
             # This is the first time the register attendance page will be check, this is to stop botcheckers/checking when there isn't anything to check

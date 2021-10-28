@@ -16,7 +16,6 @@ def get_utc_now(tz, iso: bool = False) -> Union[datetime, str]:
         Returns:
             Datetime now if iso is false, otherwise a string in ISO format
     """
-    
     now = datetime.now().astimezone(tz)
     return now if not iso else now.isoformat()
 
