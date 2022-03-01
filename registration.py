@@ -89,6 +89,16 @@ def click_button(email: str, password: str, headless: bool = True, verbose: bool
         password_form.send_keys(password)
         submit_button.click()
 
+        # A new cookies button was added on 28/02/2022
+        try:
+            no_button = WebDriverWait(browser, TIMEOUT).until(EC.presence_of_element_located((By.ID, 'noThanksBtn')))
+            if verbose:
+                print('Found cookies prompt. Clicking no...')
+            no_button.click()
+        except TimeoutException:
+            if verbose:
+                print('Assuming there is no cookies prompt...')
+
         # Wait until an element with the classes pb-block and mainBlock is found (this is because when the page is loaded both divs have classes 'pb-block ng-hide mainBlock')
         # Recently the sign-in page has been very slow so we'll wait for a bit
         tries = 7
