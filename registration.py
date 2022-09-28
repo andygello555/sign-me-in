@@ -1,10 +1,11 @@
+import sys
 import time
 from typing import Iterable
 from utils.config import CONFIG
 from selenium.common.exceptions import ElementClickInterceptedException, NoSuchElementException, TimeoutException
 from selenium.webdriver import Firefox
 from selenium.webdriver.firefox.options import Options
-from selenium.webdriver.firefox.webelement import FirefoxWebElement
+from selenium.webdriver.remote.webelement import WebElement
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
@@ -45,9 +46,9 @@ def start_selenium(headless: bool):
     browser.get(REGISTER_ATTENDANCE_URL)
     return browser
 
-def print_attr_elements(browser, elements: Iterable[FirefoxWebElement]):
+def print_attr_elements(browser, elements: Iterable[WebElement]):
     """
-        Prints all the html attributes in a given list of FireFoxWebElements
+        Prints all the html attributes in a given list of WebElement
 
         Args:
             browser: the selenium browser driver
@@ -121,9 +122,9 @@ def click_button(email: str, password: str, headless: bool = True, verbose: bool
         raise CannotLoginException('Cannot login to Campus Connect. This could be due to factors other than an incorrect login')
 
 
-    happening_now_div = browser.find_element_by_id('pbid-blockFoundHappeningNow')
-    happened_before_div = browser.find_element_by_id('pbid-blockHappened30MinAgo')
-    nothing_now_div = browser.find_element_by_id('pbid-blockNothingHappeningNow')
+    happening_now_div = browser.find_element(By.ID, 'pbid-blockFoundHappeningNow')
+    happened_before_div = browser.find_element(By.ID, 'pbid-blockHappened30MinAgo')
+    nothing_now_div = browser.find_element(By.ID, 'pbid-blockNothingHappeningNow')
 
     if verbose:
         print('\nFound sign-in blocks:')
@@ -138,11 +139,11 @@ def click_button(email: str, password: str, headless: bool = True, verbose: bool
         # Check if happening now div is hidden
         if HIDDEN_CLASS not in happening_now_div.get_attribute('class'):
             # Find the buttons (can either be one or two)
-            one_button = happening_now_div.find_element_by_id('pbid-blockFoundHappeningNowButtonsOne')
-            two_buttons = happening_now_div.find_element_by_id('pbid-blockFoundHappeningNowButtonsTwo')
+            one_button = happening_now_div.find_element(By.ID, 'pbid-blockFoundHappeningNowButtonsOne')
+            two_buttons = happening_now_div.find_element(By.ID, 'pbid-blockFoundHappeningNowButtonsTwo')
 
             # Get the course ID
-            course_name = happening_now_div.find_element_by_id('pbid-literalHappeningNowTitle')
+            course_name = happening_now_div.find_element(By.ID, 'pbid-literalHappeningNowTitle')
             course_name = browser.execute_script(GET_TEXT_SCRIPT, course_name).split(' ')[0]
 
             if course_id is None or course_id.lower() in course_name.lower() or \
@@ -164,8 +165,8 @@ def click_button(email: str, password: str, headless: bool = True, verbose: bool
         if HIDDEN_CLASS not in happened_before_div.get_attribute('class'):
             WebDriverWait(browser, TIMEOUT).until(EC.presence_of_element_located((By.ID, "pbid-blockHappened30MinAgoButtonsOne")))
 
-            one_button = happened_before_div.find_element_by_id('pbid-blockHappened30MinAgoButtonsOne')
-            two_buttons = happened_before_div.find_element_by_id('pbid-blockHappened30MinAgoButtonsTwo')
+            one_button = happened_before_div.find_element(By.ID, 'pbid-blockHappened30MinAgoButtonsOne')
+            two_buttons = happened_before_div.find_element(By.ID, 'pbid-blockHappened30MinAgoButtonsTwo')
 
             if verbose:
                 print('\nHappened 30 min ago is not hidden:')
@@ -194,4 +195,5 @@ def click_button(email: str, password: str, headless: bool = True, verbose: bool
     return button is not None
 
 if __name__ == '__main__':
-    print('Pressed button' if click_button(input('Enter email: '), input('Enter password: '), verbose=True, headless=CONFIG.HEADLESS) else 'Button not pressed')
+    headless = '--headless' in sys.argv
+    print('Pressed button' if click_button(input('Enter email: '), input('Enter password: '), verbose=True, headless=headless) else 'Button not pressed')
